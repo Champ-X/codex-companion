@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codex Companion</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app" class="pet-window theme-fox loading">
+      <div class="drag-strip" aria-label="拖动窗口"></div>
+
+      <div class="hover-actions">
+        <button id="pet-button" class="icon-button" aria-label="切换宠物" title="切换宠物">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10.2c1.1-.2 1.7-1.5 1.4-2.9S8.4 5 7.3 5.2 5.6 6.7 5.9 8s1.3 2.4 2.4 2.2Zm7.4 0c1.1.2 2.1-.8 2.4-2.2s-.3-2.7-1.4-2.8-2.1.8-2.4 2.2.3 2.6 1.4 2.8ZM5.4 14c.8-.6.7-2-.1-3.1s-2.1-1.5-2.9-.9-.7 2 .1 3.1 2.1 1.5 2.9.9Zm13.2 0c.8.6 2.1.2 2.9-.9s.9-2.5.1-3.1-2.1-.2-2.9.9-.9 2.5-.1 3.1ZM12 10.4c-2.7 0-5.7 3.3-5.7 5.8 0 1.8 1.5 2.8 3.2 2.8.9 0 1.7-.4 2.5-.4s1.6.4 2.5.4c1.7 0 3.2-1 3.2-2.8 0-2.5-3-5.8-5.7-5.8Z"/></svg>
+        </button>
+        <button id="refresh-button" class="icon-button" aria-label="实时刷新" title="实时刷新">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.4 7.1A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.1-3.5L14 11h7V4l-2.6 3.1Z"/></svg>
+        </button>
+        <button id="hide-button" class="icon-button" aria-label="隐藏到托盘" title="隐藏到托盘">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7.4 5.9 4.6 4.7 4.6-4.7L18 7.3 13.4 12l4.6 4.7-1.4 1.4-4.6-4.7-4.6 4.7L6 16.7l4.6-4.7L6 7.3z"/></svg>
+        </button>
+      </div>
+
+      <div id="pet" class="pet pet-fox state-energized" role="img" aria-label="Codex 小狐" title="按住小狐拖动">
+        <div class="pet-sprite" aria-hidden="true"></div>
+      </div>
+
+      <aside id="idle-meter" class="idle-meter" aria-label="5 小时剩余额度">
+        <span class="meter-sigil" aria-hidden="true"></span>
+        <span class="meter-label">5h 剩余</span>
+        <div class="meter-rail"><i></i></div>
+        <strong id="idle-five-hour-value">--%</strong>
+      </aside>
+
+      <section class="hover-card" aria-label="Codex 剩余额度">
+        <div class="quota-grid">
+          <div class="quota-item" id="five-hour-quota">
+            <i class="quota-ring" aria-hidden="true"></i>
+            <span>5 小时</span>
+            <strong id="five-hour-value">--%</strong>
+            <small>剩余</small>
+          </div>
+          <div class="quota-item" id="weekly-quota">
+            <i class="quota-ring" aria-hidden="true"></i>
+            <span>每周</span>
+            <strong id="weekly-value">--%</strong>
+            <small>剩余</small>
+          </div>
+        </div>
+        <div class="token-summary" title="今日 Token 使用量">
+          <span class="token-gem" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 8 5v10l-8 5-8-5V7l8-5Zm0 2.5L7 7.6l5 3.1 5-3.1-5-3.1Zm-6 5v6.4l5 3.1v-6.4L6 9.5Zm7 9.5 5-3.1V9.5l-5 3.1V19Z"/></svg></span>
+          <span class="token-copy">今日 Token</span>
+          <strong id="token-total">--</strong>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

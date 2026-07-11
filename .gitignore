@@ -1,0 +1,11 @@
+node_modules/
+.venv/
+.agents/
+release/
+release-*/
+dist/
+tmp/
+*.log
+*.blockmap
+.DS_Store
+Thumbs.db

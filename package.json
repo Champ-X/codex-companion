@@ -1,0 +1,51 @@
+{
+  "name": "codex-companion",
+  "version": "2.0.0",
+  "description": "A privacy-first Windows desktop companion for Codex usage and quota tracking.",
+  "main": "src/main.js",
+  "author": "Codex Companion contributors",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "test": "node --test",
+    "icon": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-icon.ps1",
+    "pack": "electron-builder --dir --win",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.codexcompanion.desktop",
+    "productName": "Codex Companion",
+    "electronDist": "node_modules/electron/dist",
+    "asar": true,
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Codex Companion"
+    }
+  }
+}
