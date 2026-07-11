@@ -54,16 +54,18 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .pet-window:hover .pet { top: -23px; left: 50%; transform: translateX(-50%) scale(.75); }
 .pet-window:hover::before { left: 50%; opacity: .58; }
 .dragging .pet, .dragging .drag-strip { cursor: grabbing; }
-.pet-sprite { position: absolute; inset: 0; background-repeat: no-repeat; background-position: 0 0; background-size: 200% 200%; pointer-events: none; transform-origin: 50% 78%; will-change: transform; }
+.pet-sprite { position: absolute; inset: 5px; background-repeat: no-repeat; background-position: 0 0; background-size: 200% 200%; pointer-events: none; transform-origin: 50% 78%; will-change: transform; }
 .pet-fox .pet-sprite { background-image: url("assets/pets/fox-atlas.png"); }
 .pet-collie .pet-sprite { background-image: url("assets/pets/collie-atlas.png"); }
 .pet-cat .pet-sprite { background-image: url("assets/pets/cat-atlas.png"); }
 .state-energized .pet-sprite { background-position: 0 0; animation: celebrate 1.45s cubic-bezier(.45,0,.45,1) infinite; }
+.state-energized.pet-collie .pet-sprite { inset: 0; background-image: url("assets/pets/collie-energized-full.png"); background-position: center; background-size: contain; }
+.state-energized.pet-cat .pet-sprite { inset: 0; background-image: url("assets/pets/cat-energized-full.png"); background-position: center; background-size: contain; }
 .state-focused .pet-sprite { background-position: 100% 0; animation: focus-bob 2.25s ease-in-out infinite; }
 .state-checking.pet-fox .pet-sprite { background-image: url("assets/pets/fox-medium.png"); }
 .state-checking.pet-collie .pet-sprite { background-image: url("assets/pets/collie-medium.png"); }
 .state-checking.pet-cat .pet-sprite { background-image: url("assets/pets/cat-medium.png"); }
-.state-checking .pet-sprite { background-position: center; background-size: contain; animation: checking 2.65s ease-in-out infinite; }
+.state-checking .pet-sprite { inset: 0; background-position: center; background-size: contain; animation: checking 2.65s ease-in-out infinite; }
 .state-worried .pet-sprite { background-position: 0 100%; animation: worried 2.7s ease-in-out infinite; }
 .state-sleepy .pet-sprite { background-position: 100% 100%; animation: sleeping 3.4s ease-in-out infinite; }
 @keyframes celebrate { 0%,100% { transform: translateY(1px) rotate(-.5deg); } 45% { transform: translateY(-5px) rotate(1deg) scale(1.015); } 70% { transform: translateY(0) rotate(.2deg); } }
