@@ -29,10 +29,9 @@ function safeNumber(value) {
 
 function formatTokens(value) {
   const number = safeNumber(value);
-  return new Intl.NumberFormat('zh-CN', {
-    notation: number >= 10_000 ? 'compact' : 'standard',
-    maximumFractionDigits: number >= 1_000_000 ? 2 : 1,
-  }).format(number);
+  const millions = number / 1_000_000;
+  const maximumFractionDigits = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
+  return `${new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(millions)}M`;
 }
 
 function formatReset(epochSeconds) {
