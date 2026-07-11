@@ -20,5 +20,13 @@
     return 'sleepy';
   }
 
-  return { QUOTA_TIERS, classifyQuotaState };
+  function selectPetRemaining(limits) {
+    const fiveHour = Number(limits?.fiveHour?.remainingPercent);
+    if (Number.isFinite(fiveHour)) return fiveHour;
+
+    const weekly = Number(limits?.weekly?.remainingPercent);
+    return Number.isFinite(weekly) ? weekly : 100;
+  }
+
+  return { QUOTA_TIERS, classifyQuotaState, selectPetRemaining };
 }));

@@ -111,12 +111,8 @@ function renderUsage(usage) {
   renderQuota('weekly', usage?.limits?.weekly);
   elements.tokenTotal.textContent = formatTokens(usage?.today?.displayTokens);
 
-  const remaining = [
-    usage?.limits?.fiveHour?.remainingPercent,
-    usage?.limits?.weekly?.remainingPercent,
-  ].filter((value) => Number.isFinite(Number(value))).map(Number);
-  const lowest = remaining.length ? Math.min(...remaining) : 100;
-  applyPetState(lowest);
+  const petRemaining = window.CodexQuotaState.selectPetRemaining(usage?.limits);
+  applyPetState(petRemaining);
 }
 
 async function refresh() {
