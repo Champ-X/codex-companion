@@ -5,7 +5,7 @@ const { CodexUsageService } = require('./usage-service');
 const { CodexAppServerClient } = require('./app-server-client');
 
 const WINDOW_SIZES = {
-  default: { width: 204, height: 232 },
+  default: { width: 248, height: 232 },
 };
 const PET_TYPES = ['fox', 'collie', 'cat'];
 
@@ -15,7 +15,7 @@ let refreshTimer = null;
 let saveTimer = null;
 let isQuitting = false;
 let usageSnapshot = null;
-const liveClient = new CodexAppServerClient({ clientVersion: '2.1.3' });
+const liveClient = new CodexAppServerClient({ clientVersion: '2.1.4' });
 const usageService = new CodexUsageService({ liveClient });
 let dragState = null;
 let restoringWindowSize = false;

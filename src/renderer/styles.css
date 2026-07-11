@@ -32,7 +32,7 @@ button { font: inherit; -webkit-app-region: no-drag; }
   content: "";
   position: absolute;
   top: 15px;
-  left: 50%;
+  left: calc(50% + 26px);
   width: 170px;
   height: 152px;
   border-radius: 50%;
@@ -50,7 +50,7 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .icon-button.spinning svg { animation: spin .65s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.pet { position: absolute; z-index: 3; top: 0; left: 50%; width: 196px; height: 196px; overflow: visible; border: 0; outline: 0; background: transparent; cursor: grab; touch-action: none; transform: translateX(-50%) scale(1); transition: top .2s ease, left .2s ease, transform .2s ease, filter .22s ease; }
+.pet { position: absolute; z-index: 3; top: 0; left: calc(50% + 26px); width: 196px; height: 196px; overflow: visible; border: 0; outline: 0; background: transparent; cursor: grab; touch-action: none; transform: translateX(-50%) scale(1); transition: top .2s ease, left .2s ease, transform .2s ease, filter .22s ease; }
 .pet-window:hover .pet { top: -4px; left: 50%; transform: translateX(-50%) scale(.75); }
 .pet-window:hover::before { left: 50%; opacity: .58; }
 .dragging .pet, .dragging .drag-strip { cursor: grabbing; }
