@@ -47,8 +47,8 @@ function formatReset(epochSeconds) {
 function renderQuota(kind, data) {
   const value = elements[`${kind}Value`];
   const item = elements[`${kind}Quota`];
-  item.classList.remove('warning', 'danger');
-  if (kind === 'fiveHour') elements.idleMeter.classList.remove('warning', 'danger');
+  item.classList.remove('medium', 'warning', 'danger');
+  if (kind === 'fiveHour') elements.idleMeter.classList.remove('medium', 'warning', 'danger');
   if (!data) {
     value.textContent = '--%';
     item.style.setProperty('--remaining', '0%');
@@ -65,10 +65,12 @@ function renderQuota(kind, data) {
     elements.idleMeter.style.setProperty('--remaining', `${remaining}%`);
     elements.idleFiveHourValue.textContent = `${remaining}%`;
   }
-  item.classList.toggle('warning', remaining <= 30 && remaining > 10);
+  item.classList.toggle('medium', remaining >= 40 && remaining < 60);
+  item.classList.toggle('warning', remaining > 10 && remaining < 40);
   item.classList.toggle('danger', remaining <= 10);
   if (kind === 'fiveHour') {
-    elements.idleMeter.classList.toggle('warning', remaining <= 30 && remaining > 10);
+    elements.idleMeter.classList.toggle('medium', remaining >= 40 && remaining < 60);
+    elements.idleMeter.classList.toggle('warning', remaining > 10 && remaining < 40);
     elements.idleMeter.classList.toggle('danger', remaining <= 10);
   }
   item.title = data.resetsAt ? `${formatReset(data.resetsAt)} 重置` : '';
@@ -88,9 +90,10 @@ function applyPet(pet) {
 }
 
 function applyPetState(lowest) {
-  const state = lowest >= 75 ? 'energized' : lowest >= 40 ? 'focused' : lowest >= 15 ? 'worried' : 'sleepy';
-  elements.pet.classList.remove('state-energized', 'state-focused', 'state-worried', 'state-sleepy');
+  const state = window.CodexQuotaState.classifyQuotaState(lowest);
+  elements.pet.classList.remove('state-energized', 'state-focused', 'state-checking', 'state-worried', 'state-sleepy');
   elements.pet.classList.add(`state-${state}`);
+  elements.pet.dataset.quotaState = state;
 }
 
 function renderUsage(usage) {

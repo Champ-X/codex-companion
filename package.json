@@ -1,6 +1,6 @@
 {
   "name": "codex-companion",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A privacy-first Windows desktop companion for Codex usage and quota tracking.",
   "main": "src/main.js",
   "author": "Codex Companion contributors",

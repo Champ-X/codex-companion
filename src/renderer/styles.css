@@ -60,10 +60,15 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .pet-cat .pet-sprite { background-image: url("assets/pets/cat-atlas.png"); }
 .state-energized .pet-sprite { background-position: 0 0; animation: celebrate 1.45s cubic-bezier(.45,0,.45,1) infinite; }
 .state-focused .pet-sprite { background-position: 100% 0; animation: focus-bob 2.25s ease-in-out infinite; }
+.state-checking.pet-fox .pet-sprite { background-image: url("assets/pets/fox-medium.png"); }
+.state-checking.pet-collie .pet-sprite { background-image: url("assets/pets/collie-medium.png"); }
+.state-checking.pet-cat .pet-sprite { background-image: url("assets/pets/cat-medium.png"); }
+.state-checking .pet-sprite { background-position: center; background-size: contain; animation: checking 2.65s ease-in-out infinite; }
 .state-worried .pet-sprite { background-position: 0 100%; animation: worried 2.7s ease-in-out infinite; }
 .state-sleepy .pet-sprite { background-position: 100% 100%; animation: sleeping 3.4s ease-in-out infinite; }
 @keyframes celebrate { 0%,100% { transform: translateY(1px) rotate(-.5deg); } 45% { transform: translateY(-5px) rotate(1deg) scale(1.015); } 70% { transform: translateY(0) rotate(.2deg); } }
 @keyframes focus-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2px) scale(1.006,.994); } }
+@keyframes checking { 0%,100% { transform: translateY(0) rotate(-.35deg); } 45% { transform: translateY(-2px) rotate(.65deg) scale(1.006); } 70% { transform: translateY(0) rotate(.15deg); } }
 @keyframes worried { 0%,86%,100% { transform: translateX(0) rotate(0); } 89% { transform: translateX(-1.5px) rotate(-.35deg); } 92% { transform: translateX(1.5px) rotate(.35deg); } 95% { transform: translateX(-1px); } }
 @keyframes sleeping { 0%,100% { transform: translateY(1px) scale(1); opacity: .97; } 50% { transform: translateY(2px) scale(1.012,.988); opacity: 1; } }
 
@@ -71,7 +76,8 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .idle-meter::before { content: ""; position: absolute; inset: 3px; border: 1px solid color-mix(in srgb,var(--gauge-color) 24%,rgba(255,255,255,.72)); border-radius: 14px; }
 .idle-meter::after { content: "✦"; position: absolute; top: 30px; right: 5px; color: color-mix(in srgb,var(--gauge-color) 72%,white); font-size: 7px; opacity: .82; }
 .theme-cat .idle-meter { --gauge-color: #78b849; }
-.idle-meter.warning { --gauge-color: #e6a13a; }
+.idle-meter.medium { --gauge-color: #efb52d; }
+.idle-meter.warning { --gauge-color: #ed7b32; }
 .idle-meter.danger { --gauge-color: var(--coral); }
 .meter-sigil { position: absolute; z-index: 2; top: -9px; left: 50%; display: grid; width: 25px; height: 25px; border: 2px solid rgba(255,255,255,.94); border-radius: 50%; background: linear-gradient(145deg,color-mix(in srgb,var(--gauge-color) 78%,white),var(--gauge-color)); color: #fff; transform: translateX(-50%); place-items: center; }
 .meter-sigil::before { content: var(--theme-mark); font-size: 11px; line-height: 1; }
@@ -100,7 +106,8 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .quota-item span { top: 12px; padding: 1px 5px; border-radius: 999px; background: color-mix(in srgb,var(--quota-color) 11%,rgba(255,255,255,.72)); color: color-mix(in srgb,var(--quota-color) 88%,var(--theme-ink)); font-size: 7px; font-weight: 780; }
 .quota-item strong { top: 26px; color: var(--quota-color); font-size: 17px; font-weight: 820; line-height: 1; letter-spacing: -.05em; }
 .quota-item small { bottom: 7px; color: var(--quota-color); font-size: 8px; font-weight: 760; }
-.quota-item.warning { --quota-color: #e6a13a; }
+.quota-item.medium { --quota-color: #efb52d; }
+.quota-item.warning { --quota-color: #ed7b32; }
 .quota-item.danger { --quota-color: var(--coral); }
 
 .token-summary { position: relative; display: grid; grid-template-columns: 25px auto minmax(0,1fr); align-items: center; gap: 5px; height: 31px; margin-top: 4px; padding: 3px 23px 3px 5px; border: 1px solid rgba(255,255,255,.92); border-radius: 14px; background: linear-gradient(100deg,rgba(255,255,255,.62),color-mix(in srgb,var(--theme-secondary) 9%,rgba(255,255,255,.48))); }
