@@ -5,6 +5,14 @@
   "main": "src/main.js",
   "author": "Codex Companion contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Champ-X/codex-companion.git"
+  },
+  "homepage": "https://github.com/Champ-X/codex-companion#readme",
+  "bugs": {
+    "url": "https://github.com/Champ-X/codex-companion/issues"
+  },
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
