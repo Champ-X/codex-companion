@@ -96,7 +96,15 @@ class CodexAppServerClient {
     }
     return {
       rateLimits: rateResult.status === 'fulfilled' ? rateResult.value : null,
+      rateLimitError:
+        rateResult.status === 'rejected'
+          ? rateResult.reason?.message || 'account/rateLimits/read failed'
+          : null,
       tokenUsage: usageResult.status === 'fulfilled' ? usageResult.value : null,
+      usageError:
+        usageResult.status === 'rejected'
+          ? usageResult.reason?.message || 'account/usage/read failed'
+          : null,
       fetchedAt: new Date().toISOString(),
     };
   }

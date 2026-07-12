@@ -99,7 +99,9 @@ function applyPetState(lowest) {
 function renderUsage(usage) {
   latestUsage = usage;
   elements.app.classList.remove('loading');
-  if (usage?.isLive) {
+  if (usage?.dataSource === 'app-server-cache' || usage?.dataSource === 'last-good') {
+    elements.refreshButton.title = '实时同步暂时失败 · 保持上次可信额度';
+  } else if (usage?.isLive) {
     elements.refreshButton.title = '实时数据 · 点击刷新';
   } else if (usage?.ok) {
     elements.refreshButton.title = '本地缓存 · 点击重试实时同步';

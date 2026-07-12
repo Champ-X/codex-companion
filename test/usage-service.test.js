@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   CodexUsageService,
+  isRateLimitSnapshotFresh,
   normalizeRateLimits,
   parseSessionContent,
   selectGeneralRateLimit,
@@ -134,6 +135,33 @@ test('normalizeRateLimits reports an expired window as fully remaining', () => {
   assert.equal(normalized.weekly.remainingPercent, 45);
 });
 
+test('isRateLimitSnapshotFresh rejects older windows and impossible upward jumps', () => {
+  const current = {
+    limit_id: 'codex',
+    primary: { used_percent: 52, window_minutes: 300, resets_at: 2_000 },
+    secondary: { used_percent: 41, window_minutes: 10080, resets_at: 5_000 },
+  };
+  const older = {
+    limit_id: 'codex',
+    primary: { used_percent: 0, window_minutes: 300, resets_at: 1_000 },
+    secondary: { used_percent: 22, window_minutes: 10080, resets_at: 4_000 },
+  };
+  const sameWindowJump = {
+    limit_id: 'codex',
+    primary: { used_percent: 0, window_minutes: 300, resets_at: 2_000 },
+    secondary: { used_percent: 22, window_minutes: 10080, resets_at: 5_000 },
+  };
+  const legitimateReset = {
+    limit_id: 'codex',
+    primary: { used_percent: 0, window_minutes: 300, resets_at: 3_000 },
+    secondary: { used_percent: 42, window_minutes: 10080, resets_at: 5_000 },
+  };
+
+  assert.equal(isRateLimitSnapshotFresh(current, older, 100), false);
+  assert.equal(isRateLimitSnapshotFresh(current, sameWindowJump, 100), false);
+  assert.equal(isRateLimitSnapshotFresh(current, legitimateReset, 100), true);
+});
+
 test('CodexUsageService prefers live app-server limits and account daily tokens', async () => {
   const now = new Date('2026-07-11T01:00:00.000Z');
   const service = new CodexUsageService({
@@ -167,4 +195,58 @@ test('CodexUsageService prefers live app-server limits and account daily tokens'
   assert.equal(usage.limits.weekly.remainingPercent, 98);
   assert.equal(usage.today.displayTokens, 123456);
   assert.equal(usage.today.source, 'account-daily');
+});
+
+test('CodexUsageService keeps the last trusted live limits during a transient rate-limit failure', async () => {
+  const now = new Date('2026-07-13T01:00:00.000Z');
+  let call = 0;
+  const service = new CodexUsageService({
+    homeDir: 'Z:\\codex-companion-test-missing-home',
+    now: () => now,
+    liveClient: {
+      readSnapshot: async () => {
+        call += 1;
+        if (call === 1) {
+          return {
+            fetchedAt: now.toISOString(),
+            rateLimits: {
+              rateLimitsByLimitId: {
+                codex: {
+                  limitId: 'codex',
+                  primary: {
+                    usedPercent: 52,
+                    windowDurationMins: 300,
+                    resetsAt: 9999999999,
+                  },
+                  secondary: {
+                    usedPercent: 41,
+                    windowDurationMins: 10080,
+                    resetsAt: 9999999999,
+                  },
+                },
+              },
+            },
+            tokenUsage: null,
+          };
+        }
+        return {
+          fetchedAt: now.toISOString(),
+          rateLimits: null,
+          rateLimitError: 'account/rateLimits/read request timed out',
+          tokenUsage: { dailyUsageBuckets: [] },
+        };
+      },
+    },
+  });
+
+  const live = await service.getUsage();
+  const transientFailure = await service.getUsage();
+
+  assert.equal(live.limits.fiveHour.remainingPercent, 48);
+  assert.equal(live.limits.weekly.remainingPercent, 59);
+  assert.equal(transientFailure.dataSource, 'app-server-cache');
+  assert.equal(transientFailure.isStaleRate, true);
+  assert.equal(transientFailure.limits.fiveHour.remainingPercent, 48);
+  assert.equal(transientFailure.limits.weekly.remainingPercent, 59);
+  assert.match(transientFailure.liveError, /timed out/);
 });

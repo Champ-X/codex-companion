@@ -175,6 +175,36 @@ function normalizeRateLimits(raw, nowEpochSeconds = Date.now() / 1000) {
   };
 }
 
+function isRateLimitSnapshotFresh(previous, candidate, nowEpochSeconds = Date.now() / 1000) {
+  if (!previous || !candidate) return true;
+  const before = normalizeRateLimits(previous, nowEpochSeconds);
+  const next = normalizeRateLimits(candidate, nowEpochSeconds);
+
+  for (const key of ['fiveHour', 'weekly']) {
+    const oldWindow = before?.[key];
+    const newWindow = next?.[key];
+    if (oldWindow && !newWindow) return false;
+    if (!oldWindow || !newWindow) continue;
+
+    const oldReset = oldWindow.resetsAt && oldWindow.resetsAt >= 1e12
+      ? oldWindow.resetsAt / 1000
+      : oldWindow.resetsAt;
+    const newReset = newWindow.resetsAt && newWindow.resetsAt >= 1e12
+      ? newWindow.resetsAt / 1000
+      : newWindow.resetsAt;
+    if (oldReset && newReset && newReset < oldReset) return false;
+
+    const sameWindow = oldReset && newReset
+      ? newReset === oldReset
+      : !oldReset && !newReset;
+    if (sameWindow && newWindow.remainingPercent > oldWindow.remainingPercent + 3) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function isModelSpecificRateLimit(raw) {
   const identity = `${rateField(raw, 'limit_id', 'limitId') || ''} ${rateField(raw, 'limit_name', 'limitName') || ''}`.toLowerCase();
   return /spark|bengalfox/.test(identity);
@@ -249,7 +279,12 @@ function localDateKey(now = new Date()) {
 }
 
 class CodexUsageService {
-  constructor({ homeDir = os.homedir(), now = () => new Date(), liveClient = null } = {}) {
+  constructor({
+    homeDir = os.homedir(),
+    now = () => new Date(),
+    liveClient = null,
+    liveRateCacheTtlMs = 120_000,
+  } = {}) {
     this.codexDir = path.join(homeDir, '.codex');
     this.roots = [
       path.join(this.codexDir, 'sessions'),
@@ -257,6 +292,8 @@ class CodexUsageService {
     ];
     this.now = now;
     this.liveClient = liveClient;
+    this.liveRateCacheTtlMs = liveRateCacheTtlMs;
+    this.lastLiveGeneralRate = null;
     this.cache = new Map();
   }
 
@@ -330,12 +367,40 @@ class CodexUsageService {
     const { snapshot: liveSnapshot, error: liveError } = await livePromise;
     const liveRateResponse = liveSnapshot?.rateLimits;
     const liveRateBuckets = liveRateResponse?.rateLimitsByLimitId || null;
-    const liveGeneralRate =
+    const liveGeneralRateCandidate =
       liveRateBuckets?.codex ||
       (rateField(liveRateResponse?.rateLimits, 'limit_id', 'limitId') === 'codex'
         ? liveRateResponse.rateLimits
         : null);
-    const chosenRate = liveGeneralRate || localGeneralRateEvent?.value || null;
+    const rejectedStaleLiveRate = Boolean(
+      liveGeneralRateCandidate &&
+      this.lastLiveGeneralRate &&
+      !isRateLimitSnapshotFresh(
+        this.lastLiveGeneralRate.value,
+        liveGeneralRateCandidate,
+        now.getTime() / 1000,
+      ),
+    );
+    const liveGeneralRate = rejectedStaleLiveRate ? null : liveGeneralRateCandidate;
+    if (liveGeneralRate) {
+      this.lastLiveGeneralRate = {
+        value: liveGeneralRate,
+        fetchedAtMs: Date.parse(liveSnapshot?.fetchedAt) || now.getTime(),
+      };
+    }
+    const cachedLiveGeneralRate =
+      !liveGeneralRate &&
+      this.lastLiveGeneralRate &&
+      now.getTime() - this.lastLiveGeneralRate.fetchedAtMs <= this.liveRateCacheTtlMs
+        ? this.lastLiveGeneralRate
+        : null;
+    const chosenRate =
+      liveGeneralRate || cachedLiveGeneralRate?.value || localGeneralRateEvent?.value || null;
+    const rateSource = liveGeneralRate
+      ? 'app-server'
+      : cachedLiveGeneralRate
+        ? 'app-server-cache'
+        : 'local-cache';
     const todayAccountBucket = liveSnapshot?.tokenUsage?.dailyUsageBuckets?.find(
       (bucket) => bucket.startDate === localDateKey(now),
     ) || null;
@@ -349,10 +414,15 @@ class CodexUsageService {
       : daily.total_tokens;
     const isLive = Boolean(liveGeneralRate);
     return {
-      ok: readableFiles > 0 || isLive,
+      ok: readableFiles > 0 || Boolean(chosenRate),
       isLive,
-      dataSource: isLive ? 'app-server' : 'local-cache',
-      liveError: liveError?.message || null,
+      isStaleRate: Boolean(cachedLiveGeneralRate),
+      dataSource: rateSource,
+      liveError:
+        (rejectedStaleLiveRate ? 'Ignored an older app-server rate-limit snapshot' : null) ||
+        liveSnapshot?.rateLimitError ||
+        liveError?.message ||
+        null,
       updatedAt: now.toISOString(),
       source: this.codexDir,
       filesScanned: readableFiles,
@@ -376,6 +446,8 @@ class CodexUsageService {
         : [...latestRateEventsById.keys()],
       limitObservedAt: liveGeneralRate
         ? liveSnapshot.fetchedAt
+        : cachedLiveGeneralRate
+          ? new Date(cachedLiveGeneralRate.fetchedAtMs).toISOString()
         : localGeneralRateEvent
           ? new Date(localGeneralRateEvent.timestamp).toISOString()
           : null,
@@ -393,6 +465,7 @@ module.exports = {
   localDayRange,
   localDateKey,
   normalizeRateLimits,
+  isRateLimitSnapshotFresh,
   parseSessionContent,
   selectGeneralRateLimit,
   tokenDelta,

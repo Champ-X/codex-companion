@@ -12,10 +12,11 @@ const PET_TYPES = ['fox', 'collie', 'cat'];
 let mainWindow = null;
 let tray = null;
 let refreshTimer = null;
+let refreshPromise = null;
 let saveTimer = null;
 let isQuitting = false;
 let usageSnapshot = null;
-const liveClient = new CodexAppServerClient({ clientVersion: '2.1.4' });
+const liveClient = new CodexAppServerClient({ clientVersion: '2.1.5' });
 const usageService = new CodexUsageService({ liveClient });
 let dragState = null;
 let restoringWindowSize = false;
@@ -219,31 +220,50 @@ function toggleWindow() {
 }
 
 async function refreshUsage(force = false) {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      usageSnapshot = await usageService.getUsage({ force });
+    } catch (error) {
+      usageSnapshot = usageSnapshot?.limits
+        ? {
+            ...usageSnapshot,
+            isLive: false,
+            isStaleRate: true,
+            dataSource: 'last-good',
+            liveError: error.message,
+            updatedAt: new Date().toISOString(),
+          }
+        : {
+            ok: false,
+            updatedAt: new Date().toISOString(),
+            source: usageService.codexDir,
+            today: {
+              totalTokens: 0,
+              displayTokens: 0,
+              source: 'unavailable',
+              processedTokens: 0,
+              effectiveTokens: 0,
+              inputTokens: 0,
+              uncachedInputTokens: 0,
+              cachedInputTokens: 0,
+              outputTokens: 0,
+              reasoningOutputTokens: 0,
+            },
+            limits: null,
+            message: `读取失败：${error.message}`,
+          };
+    }
+    mainWindow?.webContents.send('usage:update', usageSnapshot);
+    return usageSnapshot;
+  })();
+
   try {
-    usageSnapshot = await usageService.getUsage({ force });
-  } catch (error) {
-    usageSnapshot = {
-      ok: false,
-      updatedAt: new Date().toISOString(),
-      source: usageService.codexDir,
-      today: {
-        totalTokens: 0,
-        displayTokens: 0,
-        source: 'unavailable',
-        processedTokens: 0,
-        effectiveTokens: 0,
-        inputTokens: 0,
-        uncachedInputTokens: 0,
-        cachedInputTokens: 0,
-        outputTokens: 0,
-        reasoningOutputTokens: 0,
-      },
-      limits: null,
-      message: `读取失败：${error.message}`,
-    };
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
   }
-  mainWindow?.webContents.send('usage:update', usageSnapshot);
-  return usageSnapshot;
 }
 
 function updateAlwaysOnTop(enabled) {

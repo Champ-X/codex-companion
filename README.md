@@ -51,6 +51,8 @@ npm run dist
 
 额度通过本机官方 `codex app-server` 的 `account/rateLimits/read` 获取，并固定使用通用 `limitId = "codex"`；Spark 独立额度不会混入。今日 Token 优先读取账户当日档，必要时使用本机会话事件补齐。
 
+自动刷新会保留最后一次可信的实时额度。短暂超时、旧窗口响应或并发刷新不会再用历史 JSONL 快照覆盖当前正确数值；只有实时额度持续不可用时才回退到本地记录。
+
 Codex Companion 不读取或保存登录令牌，也不保留提示词、回复内容或文件内容。
 
 ## License
