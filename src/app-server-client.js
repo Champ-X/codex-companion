@@ -1,25 +1,67 @@
 const { spawn } = require('node:child_process');
 const readline = require('node:readline');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
-function findCodexExecutable({ platform = process.platform, env = process.env } = {}) {
-  if (env.CODEX_EXECUTABLE) return env.CODEX_EXECUTABLE;
-  if (platform !== 'win32') return 'codex';
+function findCodexExecutable(options = {}) {
+  const platform = options.platform || process.platform;
+  const env = options.env || process.env;
+  const fsApi = options.fsApi || fs;
+  const homeDir = options.homeDir || env.HOME || env.USERPROFILE || os.homedir();
 
-  const runtimeRoot = path.join(env.LOCALAPPDATA || '', 'OpenAI', 'Codex', 'bin');
-  try {
-    const candidates = fs.readdirSync(runtimeRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => path.join(runtimeRoot, entry.name, 'codex.exe'))
-      .filter((candidate) => fs.existsSync(candidate))
-      .map((candidate) => ({ candidate, mtimeMs: fs.statSync(candidate).mtimeMs }))
-      .sort((a, b) => b.mtimeMs - a.mtimeMs);
-    if (candidates.length) return candidates[0].candidate;
-  } catch {
-    // Fall through to PATH resolution for CLI-only installations.
+  if (env.CODEX_EXECUTABLE) return env.CODEX_EXECUTABLE;
+
+  if (platform === 'win32') {
+    const runtimeRoot = path.join(env.LOCALAPPDATA || '', 'OpenAI', 'Codex', 'bin');
+    try {
+      const candidates = fsApi.readdirSync(runtimeRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => path.join(runtimeRoot, entry.name, 'codex.exe'))
+        .filter((candidate) => fsApi.existsSync(candidate))
+        .map((candidate) => ({ candidate, mtimeMs: fsApi.statSync(candidate).mtimeMs }))
+        .sort((a, b) => b.mtimeMs - a.mtimeMs);
+      if (candidates.length) return candidates[0].candidate;
+    } catch {
+      // Fall through to PATH resolution for CLI-only installations.
+    }
+    return 'codex.exe';
   }
-  return 'codex.exe';
+
+  if (platform === 'darwin') {
+    const candidates = [
+      path.join(homeDir, '.local', 'bin', 'codex'),
+      path.join(homeDir, '.codex', 'packages', 'standalone', 'current', 'bin', 'codex'),
+      '/opt/homebrew/bin/codex',
+      '/usr/local/bin/codex',
+      path.join(homeDir, '.npm-global', 'bin', 'codex'),
+      path.join(homeDir, '.volta', 'bin', 'codex'),
+      path.join(homeDir, 'Applications', 'ChatGPT.app', 'Contents', 'Resources', 'codex'),
+      '/Applications/ChatGPT.app/Contents/Resources/codex',
+      path.join(homeDir, 'Applications', 'Codex.app', 'Contents', 'Resources', 'codex'),
+      '/Applications/Codex.app/Contents/Resources/codex',
+    ];
+    const installed = candidates.find((candidate) => {
+      try {
+        return fsApi.existsSync(candidate);
+      } catch {
+        return false;
+      }
+    });
+    if (installed) return installed;
+  }
+
+  return 'codex';
+}
+
+function spawnError(error, executable) {
+  if (error?.code !== 'ENOENT') return error;
+  const wrapped = new Error(
+    `未找到 Codex 可执行文件（${executable}）。请先安装并登录 Codex，或通过 CODEX_EXECUTABLE 指定可执行文件路径。`,
+  );
+  wrapped.code = error.code;
+  wrapped.cause = error;
+  return wrapped;
 }
 
 class CodexAppServerClient {
@@ -46,8 +88,9 @@ class CodexAppServerClient {
       this.process = child;
 
       const failStart = (error) => {
-        if (!this.initialized) reject(error);
-        this.#rejectAll(error);
+        const failure = spawnError(error, this.executable);
+        if (!this.initialized) reject(failure);
+        this.#rejectAll(failure);
         this.#clearProcess();
       };
 
