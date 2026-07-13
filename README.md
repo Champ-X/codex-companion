@@ -1,6 +1,6 @@
 # Codex Companion
 
-Codex Companion 是一个常驻 Windows 桌面的 Codex 用量小宠物。它通过本机 Codex app-server 展示通用 5 小时额度、每周额度和今日 Token，不需要 API Key。
+Codex Companion 是一个常驻 Windows 与 macOS 桌面的 Codex 用量小宠物。它通过本机 Codex app-server 展示通用 5 小时额度、每周额度和今日 Token，不需要 API Key。
 
 默认界面只保留宠物与配套的 5h 能量槽；鼠标悬停后显示双圆环额度仪表和今日 Token。可以在小狐、陨石边牧与大橘猫之间切换，宠物会根据 5h 剩余额度自动进入五种状态；仅在 5h 数据缺失时回退到 weekly：
 
@@ -28,24 +28,46 @@ Codex Companion 是一个常驻 Windows 桌面的 Codex 用量小宠物。它通
 - 今日 Token 使用量
 - 小狐、陨石边牧、大橘猫三种形象
 - 五档额度状态与配套表情、动作、颜色
-- 透明置顶、拖动、托盘驻留、开机启动与实时刷新
+- 透明置顶、拖动、Windows 托盘/macOS 菜单栏驻留、开机启动与实时刷新
 - 本机读取，无需 API Key
 
 ## 开发
 
 需要 Node.js 20 或更高版本。
 
-```powershell
-npm install
+```shell
+npm ci
 npm start
 ```
 
-运行测试与构建 Windows 安装包：
+运行测试：
 
-```powershell
+```shell
 npm test
-npm run dist
 ```
+
+构建当前平台的安装包，或显式构建指定平台：
+
+```shell
+npm run dist
+npm run dist:mac
+npm run dist:win
+```
+
+`npm run dist:mac` 会生成两个独立安装包：
+
+- `release/Codex-Companion-2.1.5-mac-arm64.dmg`：Apple Silicon（M 系列）
+- `release/Codex-Companion-2.1.5-mac-x64.dmg`：Intel Mac
+
+如需仅生成未封装的应用目录，可使用 `npm run pack:mac` 或 `npm run pack:win`。`npm run icon` 会从 `assets/icon.svg` 跨平台重新生成 1024×1024 应用图标。
+
+## macOS 安装与使用
+
+打开与 Mac 架构匹配的 DMG，将 Codex Companion 拖到 Applications。当前产物用于本地安装，未使用 Apple Developer ID 签名或公证；若首次打开被 macOS 阻止，请在 Finder 中按住 Control 点击应用、选择“打开”，或前往“系统设置 → 隐私与安全性”确认打开。
+
+macOS 版本以菜单栏应用运行，不显示 Dock 图标。点击菜单栏图标可以显示或隐藏宠物、刷新数据、设置置顶与登录启动、切换宠物或退出。
+
+应用会依次查找 `CODEX_EXECUTABLE`、`~/.local/bin/codex`、Codex standalone 安装目录、Homebrew/npm 常见目录，以及 ChatGPT/Codex 应用包内的 Codex。若额度一直显示为不可用，请先确认终端中 `codex --version` 可运行，并已登录 Codex。
 
 ## 数据与隐私
 
@@ -53,7 +75,7 @@ npm run dist
 
 自动刷新会保留最后一次可信的实时额度。短暂超时、旧窗口响应或并发刷新不会再用历史 JSONL 快照覆盖当前正确数值；只有实时额度持续不可用时才回退到本地记录。
 
-Codex Companion 不读取或保存登录令牌，也不保留提示词、回复内容或文件内容。
+Codex Companion 不读取或保存登录令牌，也不保留提示词、回复内容或文件内容。Codex 可执行文件与登录信息不会被打入安装包。
 
 ## License
 
