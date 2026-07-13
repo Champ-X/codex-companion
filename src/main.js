@@ -122,6 +122,12 @@ function createWindow() {
   });
 
   mainWindow.setAlwaysOnTop(settings.alwaysOnTop, 'floating');
+  if (IS_MAC) {
+    mainWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true,
+    });
+  }
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   mainWindow.once('ready-to-show', () => mainWindow?.show());
 

@@ -65,7 +65,7 @@ npm run dist:win
 
 打开与 Mac 架构匹配的 DMG，将 Codex Companion 拖到 Applications。当前产物用于本地安装，未使用 Apple Developer ID 签名或公证；若首次打开被 macOS 阻止，请在 Finder 中按住 Control 点击应用、选择“打开”，或前往“系统设置 → 隐私与安全性”确认打开。
 
-macOS 版本以菜单栏应用运行，不显示 Dock 图标。点击菜单栏图标可以显示或隐藏宠物、刷新数据、设置置顶与登录启动、切换宠物或退出。
+macOS 版本以菜单栏应用运行，不显示 Dock 图标，悬浮宠物会同时显示在所有普通桌面与全屏 Space 中。点击菜单栏图标可以显示或隐藏宠物、刷新数据、设置置顶与登录启动、切换宠物或退出。
 
 应用会依次查找 `CODEX_EXECUTABLE`、`~/.local/bin/codex`、Codex standalone 安装目录、Homebrew/npm 常见目录，以及 ChatGPT/Codex 应用包内的 Codex。若额度一直显示为不可用，请先确认终端中 `codex --version` 可运行，并已登录 Codex。
 
