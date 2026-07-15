@@ -1,0 +1,31 @@
+README.md
+  s_d2f5622385eb57::t_75e41fef882068 59-60,62
+assets/trayTemplate.svg
+  s_d2f5622385eb57::t_2f9fd47c65ec5a 1-13
+package-lock.json
+  s_d2f5622385eb57::t_69a06e9344b965 3,9
+package.json
+  s_d2f5622385eb57::t_2e578a30dbf3b6 3,43-52
+scripts/generate-icon.js
+  s_d2f5622385eb57::t_622cf01e1c1ef0 6-10,12,14-15,17-39,42,50-52,54-59,61-62,64-68,73
+src/main.js
+  s_d2f5622385eb57::t_6dbac94caa4a21 20,164-177,188,234,236,239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "fbe6fd706cca6d3f71b41f5020f04b69ce36d249",
+  "prompts": {},
+  "sessions": {
+    "s_d2f5622385eb57": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a0c-d245-72e0-acc1-6b64901fb03a",
+        "model": "unknown"
+      },
+      "human_author": "Champ-X <754022168@qq.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
