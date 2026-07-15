@@ -26,6 +26,7 @@ button { font: inherit; -webkit-app-region: no-drag; }
 }
 .pet-window.theme-collie { --theme-primary: #f3aa19; --theme-secondary: #e5781b; --theme-ink: #4b321c; --theme-soft: #fff0c8; --theme-mark: "☄"; }
 .pet-window.theme-cat { --theme-primary: #f3a415; --theme-secondary: #78b849; --theme-ink: #50331d; --theme-soft: #fff0c9; --theme-mark: "★"; }
+.pet-window.theme-bytepop { --theme-primary: #1d6bff; --theme-secondary: #00e3b2; --theme-ink: #0b1f5e; --theme-soft: #a7f2ff; --theme-mark: "▥"; }
 .drag-strip { position: absolute; z-index: 1; top: 0; right: 0; left: 0; height: 36px; cursor: grab; }
 
 .pet-window::before {
@@ -68,6 +69,12 @@ button { font: inherit; -webkit-app-region: no-drag; }
 .state-checking .pet-sprite { inset: 0; background-position: center; background-size: contain; animation: checking 2.65s ease-in-out infinite; }
 .state-worried .pet-sprite { background-position: 0 100%; animation: worried 2.7s ease-in-out infinite; }
 .state-sleepy .pet-sprite { background-position: 100% 100%; animation: sleeping 3.4s ease-in-out infinite; }
+.pet-bytepop .pet-sprite { inset: 0; background-position: center; background-size: contain; }
+.state-energized.pet-bytepop .pet-sprite { background-image: url("assets/pets/bytepop-energized.png"); background-position: center; background-size: contain; }
+.state-focused.pet-bytepop .pet-sprite { background-image: url("assets/pets/bytepop-focused.png"); background-position: center; background-size: contain; }
+.state-checking.pet-bytepop .pet-sprite { background-image: url("assets/pets/bytepop-checking.png"); background-position: center; background-size: contain; }
+.state-worried.pet-bytepop .pet-sprite { background-image: url("assets/pets/bytepop-worried.png"); background-position: center; background-size: contain; }
+.state-sleepy.pet-bytepop .pet-sprite { background-image: url("assets/pets/bytepop-sleepy.png"); background-position: center; background-size: contain; }
 @keyframes celebrate { 0%,100% { transform: translateY(1px) rotate(-.5deg); } 45% { transform: translateY(-5px) rotate(1deg) scale(1.015); } 70% { transform: translateY(0) rotate(.2deg); } }
 @keyframes focus-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2px) scale(1.006,.994); } }
 @keyframes checking { 0%,100% { transform: translateY(0) rotate(-.35deg); } 45% { transform: translateY(-2px) rotate(.65deg) scale(1.006); } 70% { transform: translateY(0) rotate(.15deg); } }

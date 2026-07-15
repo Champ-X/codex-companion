@@ -16,6 +16,7 @@ const PETS = [
   { id: 'fox', label: '小狐' },
   { id: 'collie', label: '陨石边牧' },
   { id: 'cat', label: '大橘猫' },
+  { id: 'bytepop', label: '字节跳跳' },
 ];
 
 let latestUsage = null;
