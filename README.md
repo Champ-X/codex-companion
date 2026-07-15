@@ -56,10 +56,10 @@ npm run dist:win
 
 `npm run dist:mac` 会生成两个独立安装包：
 
-- `release/Codex-Companion-2.1.5-mac-arm64.dmg`：Apple Silicon（M 系列）
-- `release/Codex-Companion-2.1.5-mac-x64.dmg`：Intel Mac
+- `release/Codex-Companion-2.1.6-mac-arm64.dmg`：Apple Silicon（M 系列）
+- `release/Codex-Companion-2.1.6-mac-x64.dmg`：Intel Mac
 
-如需仅生成未封装的应用目录，可使用 `npm run pack:mac` 或 `npm run pack:win`。`npm run icon` 会从 `assets/icon.svg` 跨平台重新生成 1024×1024 应用图标。
+如需仅生成未封装的应用目录，可使用 `npm run pack:mac` 或 `npm run pack:win`。`npm run icon` 会从 SVG 跨平台重新生成 1024×1024 应用图标，以及适配 macOS 明暗菜单栏的 16×16/32×32 Template Image。
 
 ## macOS 安装与使用
 

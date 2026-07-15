@@ -1,6 +1,6 @@
 {
   "name": "codex-companion",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "A privacy-first Windows and macOS desktop companion for Codex usage and quota tracking.",
   "main": "src/main.js",
   "author": "Codex Companion contributors",
@@ -40,6 +40,16 @@
     "directories": {
       "output": "release"
     },
+    "extraResources": [
+      {
+        "from": "assets/trayTemplate.png",
+        "to": "tray/trayTemplate.png"
+      },
+      {
+        "from": "assets/trayTemplate@2x.png",
+        "to": "tray/trayTemplate@2x.png"
+      }
+    ],
     "win": {
       "icon": "assets/icon.png",
       "target": [

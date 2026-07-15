@@ -17,7 +17,7 @@ let refreshPromise = null;
 let saveTimer = null;
 let isQuitting = false;
 let usageSnapshot = null;
-const liveClient = new CodexAppServerClient({ clientVersion: '2.1.5' });
+const liveClient = new CodexAppServerClient({ clientVersion: '2.1.6' });
 const usageService = new CodexUsageService({ liveClient });
 let dragState = null;
 let restoringWindowSize = false;
@@ -161,14 +161,20 @@ function createWindow() {
 }
 
 function trayIcon() {
-  const svg = IS_MAC
-    ? `
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-      <path fill="black" d="M7 11 9 4l6 4h2l6-4 2 7a11 11 0 1 1-18 0Z"/>
-      <circle cx="12" cy="16" r="1.5" fill="white"/><circle cx="20" cy="16" r="1.5" fill="white"/>
-      <path d="m14 21 2 1 2-1" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>`
-    : `
+  if (IS_MAC) {
+    const iconPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'tray', 'trayTemplate.png')
+      : path.join(__dirname, '..', 'assets', 'trayTemplate.png');
+    const template = nativeImage.createFromPath(iconPath);
+    if (!template.isEmpty()) {
+      template.setTemplateImage(true);
+      return template;
+    }
+    console.warn(`Could not load the macOS tray icon from ${iconPath}`);
+    return nativeImage.createEmpty();
+  }
+
+  const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
       <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7758e8"/><stop offset="1" stop-color="#ff9f66"/></linearGradient></defs>
       <path fill="url(#g)" d="M7 11 9 4l6 4h2l6-4 2 7a11 11 0 1 1-18 0Z"/>
@@ -179,11 +185,7 @@ function trayIcon() {
     `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`,
   );
   if (icon.isEmpty()) return nativeImage.createFromPath(process.execPath);
-  if (!IS_MAC) return icon;
-
-  const template = icon.resize({ width: 16, height: 16 });
-  template.setTemplateImage(true);
-  return template;
+  return icon;
 }
 
 function rebuildTrayMenu() {
@@ -229,10 +231,12 @@ function rebuildTrayMenu() {
 }
 
 function createTray() {
+  const icon = trayIcon();
   tray = new Tray(
-    trayIcon(),
+    icon,
     IS_MAC ? '3d3e0a88-6848-4b9b-ae22-811c9547a9f9' : undefined,
   );
+  if (IS_MAC && icon.isEmpty()) tray.setTitle('CC');
   tray.setToolTip('Codex Companion · 用量悬浮助手');
   if (!IS_MAC) tray.on('click', () => toggleWindow());
   rebuildTrayMenu();
