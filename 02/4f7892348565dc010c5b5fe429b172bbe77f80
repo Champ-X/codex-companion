@@ -1,0 +1,21 @@
+README.md
+  s_d2f5622385eb57::t_f852bdaa972bf7 13,26-31,33,36-49,87-90,101-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "024f7892348565dc010c5b5fe429b172bbe77f80",
+  "prompts": {},
+  "sessions": {
+    "s_d2f5622385eb57": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a0c-d245-72e0-acc1-6b64901fb03a",
+        "model": "unknown"
+      },
+      "human_author": "Champ-X <754022168@qq.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
