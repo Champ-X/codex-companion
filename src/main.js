@@ -8,7 +8,7 @@ const IS_MAC = process.platform === 'darwin';
 const WINDOW_SIZES = {
   default: { width: 248, height: 232 },
 };
-const PET_TYPES = ['fox', 'collie', 'cat'];
+const PET_TYPES = ['fox', 'collie', 'cat', 'bytepop'];
 
 let mainWindow = null;
 let tray = null;
@@ -17,7 +17,7 @@ let refreshPromise = null;
 let saveTimer = null;
 let isQuitting = false;
 let usageSnapshot = null;
-const liveClient = new CodexAppServerClient({ clientVersion: '2.1.6' });
+const liveClient = new CodexAppServerClient({ clientVersion: '2.2.0' });
 const usageService = new CodexUsageService({ liveClient });
 let dragState = null;
 let restoringWindowSize = false;
@@ -216,6 +216,7 @@ function rebuildTrayMenu() {
           { label: '小狐', type: 'radio', checked: settings.pet === 'fox', click: () => updatePet('fox') },
           { label: '陨石边牧', type: 'radio', checked: settings.pet === 'collie', click: () => updatePet('collie') },
           { label: '大橘猫', type: 'radio', checked: settings.pet === 'cat', click: () => updatePet('cat') },
+          { label: '字节跳跳', type: 'radio', checked: settings.pet === 'bytepop', click: () => updatePet('bytepop') },
         ],
       },
       { type: 'separator' },
